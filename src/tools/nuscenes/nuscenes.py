@@ -29,28 +29,26 @@ from nuscenes.utils.data_io import load_bin_file, panoptic_to_lidarseg
 from nuscenes.utils.geometry_utils import view_points, box_in_image, BoxVisibility, transform_matrix
 from nuscenes.utils.map_mask import MapMask
 from nuscenes.utils.color_map import get_colormap
-
+import s3fs
+s3 = s3fs.S3FileSystem()
+    
 PYTHON_VERSION = sys.version_info[0]
 
 if not PYTHON_VERSION == 3:
     raise ValueError("nuScenes dev-kit only supports Python version 3.")
 
-
+    
 class NuScenes:
     """
     Database class for nuScenes to help query and retrieve information from the database.
     """
-
-    
-    # install the data from s3fs
-    # change the dataroot to the s3 location 
-    # first try by init replaced by the s3 from the general channel
-    # dataroot to be replaced by the path to bucket
-    # s3://nuscenes-dataset/nuscenes_mini_only/
+    s3 = s3fs.S3FileSystem()
+    bucket = 'nuscenes-dataset/nuscenes/'
+    DATA_PATH = 's3://{}'.format(bucket)
     
     def __init__(self,
                  version: str = 'v1.0-mini',
-                 dataroot: str = '/data/sets/nuscenes',
+                 dataroot: str = DATA_PATH,
                  verbose: bool = True,
                  map_resolution: float = 0.1):
         """
@@ -66,7 +64,7 @@ class NuScenes:
         self.table_names = ['category', 'attribute', 'visibility', 'instance', 'sensor', 'calibrated_sensor',
                             'ego_pose', 'log', 'scene', 'sample', 'sample_data', 'sample_annotation', 'map']
 
-        assert osp.exists(self.table_root), 'Database version not found: {}'.format(self.table_root)
+        assert s3.exists(self.table_root), 'Database version not found: {}'.format(self.table_root)
 
         start_time = time.time()
         if verbose:
@@ -143,7 +141,7 @@ class NuScenes:
 
     def __load_table__(self, table_name) -> dict:
         """ Loads a table. """
-        with open(osp.join(self.table_root, '{}.json'.format(table_name))) as f:
+        with s3.open(osp.join(self.table_root, '{}.json'.format(table_name))) as f:
             table = json.load(f)
         return table
 
