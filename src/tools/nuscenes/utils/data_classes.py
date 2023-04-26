@@ -16,7 +16,8 @@ from pyquaternion import Quaternion
 from nuscenes.lidarseg.lidarseg_utils import colormap_to_colors, create_lidarseg_legend
 from nuscenes.utils.data_io import load_bin_file
 from nuscenes.utils.geometry_utils import view_points, transform_matrix
-
+import s3fs
+s3 = s3fs.S3FileSystem()
 
 class PointCloud(ABC):
     """
@@ -383,7 +384,7 @@ class RadarPointCloud(PointCloud):
         assert file_name.endswith('.pcd'), 'Unsupported filetype {}'.format(file_name)
 
         meta = []
-        with open(file_name, 'rb') as f:
+        with s3.open(file_name, 'rb') as f:
             for line in f:
                 line = line.strip().decode('utf-8')
                 meta.append(line)

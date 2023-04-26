@@ -21,15 +21,22 @@ from utils.ddd_utils import draw_box_3d, unproject_2d_to_3d
 from utils.pointcloud import RadarPointCloudWithVelocity as RadarPointCloud
 from nuScenes_lib.utils_radar import map_pointcloud_to_image
 import time
+import s3fs
 
-DATA_PATH = '../../data/nuscenes/'
-OUT_PATH = DATA_PATH + 'annotations'
+
+s3 = s3fs.S3FileSystem()
+bucket = 'nuscenes-dataset/nuscenes/'
+DATA_PATH = 's3://{}'.format(bucket)
+LOCAL_PATH = '../../data/'
+OUT_PATH = LOCAL_PATH + 'annotations'
 SPLITS = {
           'mini_val': 'v1.0-mini',
           'mini_train': 'v1.0-mini',
-          'train': 'v1.0-trainval',
-          'val': 'v1.0-trainval',
-          'test': 'v1.0-test',
+
+# skip the datasets other than mini
+#          'train': 'v1.0-trainval',
+#          'val': 'v1.0-trainval',
+#          'test': 'v1.0-test',
           }
 
 DEBUG = False

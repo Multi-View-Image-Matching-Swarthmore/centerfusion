@@ -8,6 +8,8 @@ import cv2
 import numpy as np
 from PIL import Image
 from cachetools import cached, LRUCache
+import s3fs
+s3 = s3fs.S3FileSystem()
 
 # Set the maximum loadable image size.
 Image.MAX_IMAGE_PIXELS = 400000 * 400000
@@ -20,7 +22,7 @@ class MapMask:
         :param img_file: File path to map png file.
         :param resolution: Map resolution in meters.
         """
-        assert osp.exists(img_file), 'map mask {} does not exist'.format(img_file)
+        assert s3.exists(img_file), 'map mask {} does not exist'.format(img_file)
         assert resolution >= 0.1, "Only supports down to 0.1 meter resolution."
         self.img_file = img_file
         self.resolution = resolution
